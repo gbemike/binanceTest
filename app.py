@@ -15,14 +15,14 @@ timestamp = datetime.now()
 rawData = pd.DataFrame({
     'Symbol': [symbol],
     'Price': [price],
-    'Timestamp': [timestamp]
+    'Date': [timestamp]
 })
 
 rawData.to_csv('binance_data.csv', mode='a', header=False, index = False)
 
 """sumary_line
 
-1. 
+1. Streamlit graphs with KPIS
 2. Start scheduling
 
 """
