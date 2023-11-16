@@ -1,4 +1,4 @@
-# binanceTest
+# USDT rates retrieval 
 This workspacde contains scripts that retrieve the USDT_NGN rates to be schedules every 15 minutes and retrieve the
 ohlc values so it can plotted on a candlestick chart and show live trends and analysis
 
