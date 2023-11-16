@@ -1,8 +1,6 @@
 import pandas as pd
 import streamlit as st
 from datetime import datetime as dt, timedelta as td
-from bokeh.plotting import figure, column, show
-from bokeh.models import HoverTool, NumeralTickFormatter
 import plotly.graph_objects as go
 
 st.set_page_config(layout="wide", page_title="USDT_NGN Rates Tracker")
@@ -38,14 +36,12 @@ def create_chart(df):
                      xaxis_rangeslider_visible=False,
                      template='plotly_white')
     
-    st.plotly_chart(figure,theme='streamlit', use_container_width=True)
+    st.plotly_chart(figure, theme='streamlit', use_container_width=True)
     
     return df
 
 # Add trace for close price line
 #figure.add_trace(go.Scatter(x=original_df['Date'], y=original_df['close'], mode='lines', name='Close Price'))
-
-
 
 # Dashboard
 st.title("USDT_NGN Rates Tracker :tea: :coffee:")
@@ -68,7 +64,7 @@ end_date = pd.to_datetime(end_date)
 
 # Date Range logic
 sub_df =original_df.loc[(original_df['Date'] >= start_date) & (original_df['Date'] <= end_date)]
-sub_df = sub_df.reset_index()
+#sub_df = sub_df.reset_index()
 
 sub_df = create_chart(sub_df)
 
