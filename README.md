@@ -9,7 +9,7 @@ The API is the initial point of the workspace, it provides the usdt_ngn prices w
 
 # app.py
 Retrieves the latest price information for the specified currency pairs from the Binance API and formats the data then 
-appends the data to the  initial dataframe, which has the following columns (symbol, price, date). Subsequently, the transformed dataframe, now featuring Open-High-Low-Close (OHLC) values, is appended to a new CSV file for comprehensive and organized data storage.
+appends the data to the  initial dataframe. Subsequently, the transformed dataframe, now featuring Open-High-Low-Close (OHLC) values, is appended to a new CSV file for comprehensive and organized data storage.
 
 
 # streamlit_app.py
