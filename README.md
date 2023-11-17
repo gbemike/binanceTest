@@ -16,6 +16,6 @@ appends the data to the  initial dataframe. Subsequently, the transformed datafr
 The USDT_NGN Rates Tracker is a Streamlit web application designed to visualize and analyze USDT_NGN rates over a specified date range. The app uses Plotly for interactive candlestick charting and offers a date range selection through Streamlit's user-friendly interface.
 
 
-- [] Orchestrate the project with Dagster to send API requests every 15 minutes
-- [] Trigger Slack notifications (using Dagster) on significant rate change
-    - [] Get the stakeholder requirement on significant rate change value
+- [ ] Orchestrate the project with Dagster to send API requests every 15 minutes
+- [ ] Trigger Slack notifications (using Dagster) on significant rate change
+    - [ ] Get the stakeholder requirement on significant rate change value
