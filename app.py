@@ -27,11 +27,3 @@ df = df.set_index('Date')
 ohlc_df = df.resample('15T').agg({'Price': 'ohlc'})
 
 ohlc_df.to_csv('USDT_NGN ratesss.csv', mode='a', header=False)
-
-
-"""sumary_line
-
-1. Streamlit graphs with KPIS
-2. Start scheduling
-
-"""

@@ -14,3 +14,4 @@ appends the data to the  initial dataframe. Subsequently, the transformed datafr
 
 # streamlit_app.py
 The USDT_NGN Rates Tracker is a Streamlit web application designed to visualize and analyze USDT_NGN rates over a specified date range. The app uses Plotly for interactive candlestick charting and offers a date range selection through Streamlit's user-friendly interface.
+
