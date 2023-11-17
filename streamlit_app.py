@@ -8,7 +8,7 @@ st.set_page_config(layout="wide", page_title="USDT_NGN Rates Tracker")
 # load dataset
 @st.cache_data
 def load_dataset():
-    df = pd.read_csv("USDT_NGN rates.csv", parse_dates=True)
+    df = pd.read_csv("test.csv", parse_dates=True)
     df['Date'] = pd.to_datetime(df['Date'])
 
     return df
