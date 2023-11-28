@@ -24,6 +24,6 @@ df = pd.read_csv('binance_data.csv')
 df['Date'] = pd.to_datetime(df['Date'], format='mixed')
 
 df = df.set_index('Date')
-ohlc_df = df.resample('15T').agg({'Price': 'ohlc'})
+ohlc_df = df['Price'].resample('15T').ohlc()
 
 ohlc_df.to_csv('USDT_NGN ratesss.csv', mode='a', header=False)
