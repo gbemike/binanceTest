@@ -48,7 +48,6 @@ def usdt_rates():
 
     df.to_csv("data/raw/usdt_prices.csv", mode="a",index=False, header=False)
 
-
 @asset(
         deps=[usdt_rates]
         )
