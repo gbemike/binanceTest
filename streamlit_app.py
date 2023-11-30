@@ -8,7 +8,7 @@ st.set_page_config(layout="wide", page_title="USDT_NGN Rates Tracker")
 # load dataset
 @st.cache_data
 def load_dataset():
-    df = pd.read_csv("test.csv", parse_dates=True)
+    df = pd.read_csv("usdt_rates/data/raw/binance_ohlc_rates.csv", parse_dates=True)
     df['Date'] = pd.to_datetime(df['Date'])
 
     return df
@@ -25,7 +25,9 @@ def create_chart(df):
         low = df['low'],
         close = df['close'],
         increasing_line_color = 'green',
-        decreasing_line_color = 'red'
+        decreasing_line_color = 'red',
+        increasing_line_width = 22,
+        decreasing_line_width = 22,
     )
     ]
     )

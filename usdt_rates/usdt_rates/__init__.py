@@ -2,13 +2,15 @@ from dagster import (
     Definitions,
     load_assets_from_modules,
     define_asset_job,
-    AssetSelection,
-    ScheduleDefinition,
 )
 
+from .assets import rates
 from .jobs import rates_update_job, ohlc_update_job
-from .schedule import rates_update_schedule, ohlc_update_schedule
+from .schedules import rates_update_schedule, ohlc_update_schedule
 
+rates_assets = load_assets_from_modules([rates])
+
+all_assets = [*rates_assets]
 all_jobs = [rates_update_job, ohlc_update_job]
 all_schedules = [rates_update_schedule, ohlc_update_schedule]
 

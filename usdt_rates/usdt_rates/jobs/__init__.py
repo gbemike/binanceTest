@@ -1,12 +1,8 @@
 from dagster import (
-    load_assets_from_modules,
     define_asset_job,
     AssetSelection,
 )
 
-from . import assets
-
-all_assets = load_assets_from_modules([assets])
 
 usdt_rates = AssetSelection.keys(["usdt_rates"])
 ohlc_rates = AssetSelection.keys(["ohlc_rates"])

@@ -10,9 +10,9 @@ from datetime import datetime
 import csv
 
 @asset
-def usdt_rates():
+def raw_rates():
     """
-    Rates gotten straight from the Binance API
+    Raw rates gotten straight from the Binance API
     """
 
     usdt_symbol = "USDTNGN"
@@ -20,11 +20,25 @@ def usdt_rates():
 
     usdt_prices = requests.get(usdt_endpoint).json()
 
-    symbol = usdt_prices['symbol']
-    price = usdt_prices['price']
-    date = datetime.now()
-
     os.makedirs("data/raw", exist_ok=True)
+
+    with open("data/raw/raw_rates.json", "w+") as file:
+        json.dump(usdt_prices, file)
+
+@asset(
+        deps=[raw_rates]
+       )
+def usdt_rates():
+    """
+    Reading raw_rates json file and converting to a DataFrame
+    """
+
+    with open("data/raw/raw_rates.json", "r") as file:
+        raw_rates = json.loads(file.read())
+
+    symbol = raw_rates['symbol']
+    price = raw_rates['price']
+    date = datetime.now()
     
     df = pd.DataFrame({
         'Symbol': [symbol],
@@ -33,10 +47,11 @@ def usdt_rates():
     })
 
     df.to_csv("data/raw/usdt_prices.csv", mode="a",index=False, header=False)
-    #with open("data/raw/usdt_prices.json", "w") as f:
-    #    json.dump(usdt_prices, f)
 
-@asset(deps=[usdt_rates])
+
+@asset(
+        deps=[usdt_rates]
+        )
 def ohlc_rates(context: AssetExecutionContext):
     usdt_rates = pd.read_csv("data/raw/usdt_prices.csv")
 
@@ -45,5 +60,6 @@ def ohlc_rates(context: AssetExecutionContext):
 
     usdt_rates = usdt_rates.set_index("Date")
 
-    ohlc_df = usdt_rates["Price"].resample("15T").ohlc() 
+    ohlc_df = usdt_rates["Price"].resample("15T").ohlc()
+    ohlc_df['changes'] = ((ohlc_df['close']) - (ohlc_df['open']).shift(1)) * 100
     ohlc_df.to_csv("data/raw/binance_ohlc_rates.csv")
