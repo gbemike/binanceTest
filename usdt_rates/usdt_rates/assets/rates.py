@@ -47,7 +47,9 @@ def usdt_rates():
     df.to_csv("data/raw/usdt_prices.csv", mode="a",index=False, header=False)
 
 
-@asset(deps=[usdt_rates])
+@asset(
+        deps=[usdt_rates]
+        )
 def ohlc_rates(context: AssetExecutionContext):
     usdt_rates = pd.read_csv("data/raw/usdt_prices.csv")
 
