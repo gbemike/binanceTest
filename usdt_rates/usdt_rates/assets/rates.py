@@ -25,9 +25,7 @@ def raw_rates():
     with open("data/raw/raw_rates.json", "w+") as file:
         json.dump(usdt_prices, file)
 
-@asset(
-        deps=[raw_rates]
-       )
+@asset(deps=[raw_rates])
 def usdt_rates():
     """
     Reading raw_rates json file and converting to a DataFrame
@@ -49,9 +47,7 @@ def usdt_rates():
     df.to_csv("data/raw/usdt_prices.csv", mode="a",index=False, header=False)
 
 
-@asset(
-        deps=[usdt_rates]
-        )
+@asset(deps=[usdt_rates])
 def ohlc_rates(context: AssetExecutionContext):
     usdt_rates = pd.read_csv("data/raw/usdt_prices.csv")
 
@@ -61,5 +57,5 @@ def ohlc_rates(context: AssetExecutionContext):
     usdt_rates = usdt_rates.set_index("Date")
 
     ohlc_df = usdt_rates["Price"].resample("15T").ohlc()
-    ohlc_df['changes'] = ((ohlc_df['close']) - (ohlc_df['open']).shift(1)) * 100
+    ohlc_df['changes'] = ((ohlc_df['close']) - (ohlc_df['close']).shift(1)) * 100
     ohlc_df.to_csv("data/raw/binance_ohlc_rates.csv")

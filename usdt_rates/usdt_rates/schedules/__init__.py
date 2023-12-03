@@ -3,7 +3,14 @@ from dagster import (
     ScheduleDefinition,
 )
 
-from ..jobs import rates_update_job, ohlc_update_job
+from ..jobs import rates_update_job, ohlc_update_job, raw_rates_job
+
+raw_rates_schedule = ScheduleDefinition(
+    name="rates_update_schedule",
+    job=raw_rates_job,
+    cron_schedule="*/14 * * * *",
+)
+
 
 rates_update_schedule = ScheduleDefinition(
     name="rates_update_schedule",
