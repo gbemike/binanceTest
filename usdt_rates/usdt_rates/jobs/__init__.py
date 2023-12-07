@@ -6,6 +6,7 @@ from dagster import (
 raw_rates = AssetSelection.keys(['raw_rates'])
 usdt_rates = AssetSelection.keys(["usdt_rates"])
 ohlc_rates = AssetSelection.keys(["ohlc_rates"])
+slack_alert = AssetSelection.keys(["threshold"])
 
 raw_rates_job = define_asset_job(
     name="raw_rates_job",
@@ -20,4 +21,9 @@ rates_update_job = define_asset_job(
 ohlc_update_job = define_asset_job(
     name="ohlc_update_job",
     selection=ohlc_rates,
+)
+
+slack_alert_job = define_asset_job(
+    name="slack_alert_job",
+    selection=slack_alert,
 )
