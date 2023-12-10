@@ -23,6 +23,6 @@ defs = Definitions(
     jobs=all_jobs,
     schedules=all_schedules,
     resources={
-        "slack": SlackResource(token=EnvVar("MY_SLACK_TOKEN")),
+        "slack_resource": SlackResource(token=EnvVar("MY_SLACK_TOKEN")),
     }
 )

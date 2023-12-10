@@ -10,6 +10,7 @@ from datetime import datetime
 
 import csv
 
+# @asset() decorator defines the fucntion below it as a dagster asset
 @asset
 def raw_rates():
     """
@@ -50,6 +51,9 @@ def usdt_rates():
 
 @asset(deps=[usdt_rates])
 def ohlc_rates(context: AssetExecutionContext):
+    """
+    Produces ohlc and price change values
+    """
     usdt_rates = pd.read_csv("data/raw/usdt_prices.csv")
 
     usdt_rates['Date'] = pd.to_datetime(usdt_rates['Date'])
