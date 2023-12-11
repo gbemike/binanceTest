@@ -26,7 +26,7 @@ all_jobs = [rates_update_job, ohlc_update_job, raw_rates_job, slack_alert_job]
 # list containing all schedules
 all_schedules = [rates_update_schedule, ohlc_update_schedule, raw_rates_schedule]
 
-# Defintions contain all the ingridients need for our dagster task
+# Defintions contain all the ingridients needed for our dagster task
 defs = Definitions(
     assets=all_assets,
     jobs=all_jobs,
