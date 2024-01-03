@@ -10,7 +10,6 @@ from datetime import datetime
 
 import csv
 
-# define the asset rate-change with usdt_rates as a dependency
 @asset(deps=['usdt_rates'])
 # slack_resource from usdt_rates/__init__.py contains the API TOKEN,
 # SlackResource enables sending messages to a slack channel
@@ -19,17 +18,12 @@ def rate_change(context: AssetExecutionContext, slack_resource: SlackResource):
     sends slack message on price changes
     """
 
-    # read the csv file containing USD/NGN prices
     usdt_rates = pd.read_csv("data/raw/usdt_prices.csv")
 
-    # convert usdt_rates['Date'] to a datetime object
     usdt_rates['Date'] = pd.to_datetime(usdt_rates['Date'])
 
-    # convert the "price column" from an object to a float
     usdt_rates["Price"] = usdt_rates["Price"].astype(float)
 
-    # set dataframe index to Date, this makes it a DateTime index
-    # we can only use the resample() function on dataframes with DateTime index
     usdt_rates = usdt_rates.set_index("Date")
 
     # convert all price entries to its corresponding ohlc values and aggregate it by 24 hours/ 1 day
@@ -38,9 +32,9 @@ def rate_change(context: AssetExecutionContext, slack_resource: SlackResource):
     # creating a new column called "changes" that represents price change for each day
     ohlc_df['changes'] = (((ohlc_df['close']) - (ohlc_df['close']).shift(1)) / (ohlc_df['close']).shift(1)) * 100
 
-    # convert dataframe to a csv file
     ohlc_df.to_csv("data/raw/daily_ohlc_rates.csv")
 
+    # price threshold 
     threshold = 0.5
 
     # comparing the latest value(ohlc_df['changes'].iloc[-1]) to the threshold
@@ -51,5 +45,4 @@ def rate_change(context: AssetExecutionContext, slack_resource: SlackResource):
         # our message is sent using the SlackResource class
         slack_resource.get_client().chat_postMessage(channel='#rate_updates', text=message)
     else:
-        # if the condition isn't true, we do not return anything
         pass
