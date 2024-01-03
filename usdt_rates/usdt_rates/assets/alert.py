@@ -14,7 +14,7 @@ import csv
 @asset(deps=['usdt_rates'])
 # slack_resource from usdt_rates/__init__.py contains the API TOKEN,
 # SlackResource enables sending messages to a slack channel
-def rate_change(slack_resource: SlackResource):
+def rate_change(context: AssetExecutionContext, slack_resource: SlackResource):
     """
     sends slack message on price changes
     """

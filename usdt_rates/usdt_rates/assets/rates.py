@@ -12,7 +12,7 @@ import csv
 
 # @asset() decorator defines the fucntion below it as a dagster asset
 @asset
-def raw_rates():
+def raw_rates(context: AssetExecutionContext):
     """
     Raw rates gotten straight from the Binance API
     """
@@ -31,7 +31,7 @@ def raw_rates():
         json.dump(usdt_prices, file)
 
 @asset(deps=[raw_rates])
-def usdt_rates():
+def usdt_rates(context: AssetExecutionContext):
     """
     Reading raw_rates json file and converting to a DataFrame
     """
