@@ -17,7 +17,7 @@ def rate_change(context: AssetExecutionContext, slack_resource: SlackResource):
     """
     sends slack message on price changes
     """
-
+    
     usdt_rates = pd.read_csv("data/raw/usdt_prices.csv")
 
     usdt_rates['Date'] = pd.to_datetime(usdt_rates['Date'])

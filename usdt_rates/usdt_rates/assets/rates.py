@@ -1,4 +1,4 @@
-from dagster import asset, AssetExecutionContext
+from dagster import asset, AssetExecutionContext, WeeklyPartitionsDefinition
 from dagster_slack import SlackResource
 
 import json
@@ -10,11 +10,12 @@ from datetime import datetime
 
 import csv
 
-@asset
-def raw_rates(context: AssetExecutionContext):
+@asset(partitions_def=WeeklyPartitionsDefinition(start_date="2023-12-01"))
+def raw_rates(context: AssetExecutionContext) :
     """
     Raw rates gotten straight from the Binance API
     """
+    
     usdt_symbol = "USDTNGN"
     usdt_endpoint = f"https://api.binance.com/api/v3/ticker/price?symbol={usdt_symbol}"
     
@@ -27,7 +28,7 @@ def raw_rates(context: AssetExecutionContext):
     with open("data/raw/raw_rates.json", "w+") as file:
         json.dump(usdt_prices, file)
 
-@asset(deps=[raw_rates])
+@asset(deps=[raw_rates], partitions_def=WeeklyPartitionsDefinition(start_date="2023-12-01"))
 def usdt_rates(context: AssetExecutionContext):
     """
     Reading raw_rates json file and converting to a DataFrame
@@ -49,7 +50,7 @@ def usdt_rates(context: AssetExecutionContext):
     df.to_csv("data/raw/usdt_prices.csv", mode="a",index=False, header=False)
 
 
-@asset(deps=[usdt_rates])
+@asset(deps=[usdt_rates], partitions_def=WeeklyPartitionsDefinition(start_date="2023-12-01"))
 def ohlc_rates(context: AssetExecutionContext):
     """
     Produces ohlc and price change values

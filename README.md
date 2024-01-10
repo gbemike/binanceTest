@@ -38,6 +38,6 @@ The API is the initial point of the workspace, it provides the USDT_NGN prices w
 
 
 ## To-do
-- [ ] Orchestrate the project with Dagster to send API requests every 15 minutes
-- [ ] Trigger Slack notifications (using Dagster) on significant rate change
-    - [ ] Get the stakeholder requirement on significant rate change value
+- [ ] Add Partitions
+- [ ] Integrate Tests 
+- [ ] Get the stakeholder requirement on significant rate change value
