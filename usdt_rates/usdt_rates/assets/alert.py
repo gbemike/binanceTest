@@ -1,4 +1,4 @@
-from dagster import asset, AssetExecutionContext
+from dagster import asset, AssetExecutionContext, WeeklyPartitionsDefinition
 from dagster_slack import SlackResource
 
 import json
@@ -10,7 +10,7 @@ from datetime import datetime
 
 import csv
 
-@asset(deps=['usdt_rates'])
+@asset(deps=['usdt_rates'], partitions_def=WeeklyPartitionsDefinition(start_date="2023-12-01"))
 # slack_resource from usdt_rates/__init__.py contains the API TOKEN,
 # SlackResource enables sending messages to a slack channel
 def rate_change(context: AssetExecutionContext, slack_resource: SlackResource):

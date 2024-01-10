@@ -5,17 +5,32 @@ import json
 import os
 import requests
 
+import duckdb
+import constants
+
 import pandas as pd
 from datetime import datetime
 
 import csv
 
-@asset(partitions_def=WeeklyPartitionsDefinition(start_date="2023-12-01"))
+
+USDT_PRICE_PATH = "data/raw/usdt_prices.csv"
+BINANCE_OHLC_PATH = "data/raw/binance_ohlc_rates.csv"
+DAILY_OHLC_PATHS = "data/raw/daily_ohlc_rates.csv"
+DB_PATH = "data/staging/data.duckdb"
+
+"""
+1. Create database and table for prices in duckDB
+2. Add each csv into their respective table
+3. Only read in a days worth of rows
+"""
+
+@asset()
 def raw_rates(context: AssetExecutionContext) :
     """
     Raw rates gotten straight from the Binance API
     """
-    
+
     usdt_symbol = "USDTNGN"
     usdt_endpoint = f"https://api.binance.com/api/v3/ticker/price?symbol={usdt_symbol}"
     
@@ -28,8 +43,8 @@ def raw_rates(context: AssetExecutionContext) :
     with open("data/raw/raw_rates.json", "w+") as file:
         json.dump(usdt_prices, file)
 
-@asset(deps=[raw_rates], partitions_def=WeeklyPartitionsDefinition(start_date="2023-12-01"))
-def usdt_rates(context: AssetExecutionContext):
+@asset(deps=[raw_rates])
+def usdt_rates_file(context: AssetExecutionContext):
     """
     Reading raw_rates json file and converting to a DataFrame
     """
@@ -49,14 +64,26 @@ def usdt_rates(context: AssetExecutionContext):
 
     df.to_csv("data/raw/usdt_prices.csv", mode="a",index=False, header=False)
 
+@asset()
+def usdt_rates(context: AssetExecutionContext):
+    """
+    Load usdt_rates data into database
+    """
+    
+
+
 
 @asset(deps=[usdt_rates], partitions_def=WeeklyPartitionsDefinition(start_date="2023-12-01"))
-def ohlc_rates(context: AssetExecutionContext):
+def ohlc_rates_file(context: AssetExecutionContext):
     """
     Produces ohlc and price change values
     """
 
-    usdt_rates = pd.read_csv("data/raw/usdt_prices.csv")
+    #usdt_rates = pd.read_csv("data/raw/usdt_prices.csv")
+
+    partition_date_str = context.asset_partition_key_for_output()
+
+    week_date = datetime.strptime(partition_date_str, "%Y-%m-%d").date().strftime("%Y-%m-%d")
 
     usdt_rates['Date'] = pd.to_datetime(usdt_rates['Date'])
  
