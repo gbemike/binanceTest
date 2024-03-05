@@ -40,13 +40,20 @@ def usdt_rates(context: AssetExecutionContext):
     price = raw_rates['price']
     date = datetime.now()
 
-    df = pd.DataFrame({
+    usdt_rates = pd.DataFrame({
         'Symbol': [symbol],
         'Price': [price],
         'Date': [date]
     })
+    # usdt_rates.to_csv() -> line53
 
-    df.to_csv("data/raw/usdt_prices.csv", mode="a",index=False, header=False)
+    usdt_rates['Date'] = pd.to_datetime(usdt_rates['Date'])
+ 
+    usdt_rates["Price"] = usdt_rates["Price"].astype(float)
+
+    # -> 69:74
+
+    #df.to_csv("data/raw/usdt_prices.csv", mode="a",index=False, header=False)
 
 
 @asset(deps=[usdt_rates])
@@ -56,10 +63,6 @@ def ohlc_rates(context: AssetExecutionContext):
     """
 
     usdt_rates = pd.read_csv("data/raw/usdt_prices.csv")
-
-    usdt_rates['Date'] = pd.to_datetime(usdt_rates['Date'])
- 
-    usdt_rates["Price"] = usdt_rates["Price"].astype(float)
 
     # set dataframe index to Date, this makes it a DateTime index
     # we can only use the resample() function on dataframes with DateTime index
