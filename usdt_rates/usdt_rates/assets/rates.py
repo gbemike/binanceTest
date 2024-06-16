@@ -53,7 +53,7 @@ def usdt_rates(context: AssetExecutionContext):
 
     # -> 69:74
 
-    #df.to_csv("data/raw/usdt_prices.csv", mode="a",index=False, header=False)
+    df.to_csv("data/raw/usdt_prices.csv", mode="a",index=False, header=False)
 
 
 @asset(deps=[usdt_rates])
