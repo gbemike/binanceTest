@@ -1,6 +1,6 @@
 # USDT rates retrieval 
 This workspacde contains scripts that retrieve the USDT_NGN rates to be schedules every 15 minutes and retrieve the
-ohlc values so it can be plotted on a candlestick chart in Streamlit and show live trends and analysis
+open, high, low and closing values so it can be plotted on a candlestick chart in Streamlit and show live trends and analysis
 
 ## Getting started
 
