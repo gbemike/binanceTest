@@ -39,9 +39,11 @@ def rate_change(context: AssetExecutionContext, slack_resource: SlackResource):
 
     # comparing the latest value(ohlc_df['changes'].iloc[-1]) to the threshold
     # if the above condition is true a message is sent to slack
-    if ohlc_df['changes'].iloc[-1] < threshold:
+    if abs(ohlc_df['changes'].iloc[-1]) < threshold:
+        # checks whether change is a decrease or increase
+        direction = "increased" if ohlc_df['changes'].iloc[-1] > 0 else "decreased"
         # message variable contaisn the string value that will be sent as a message to the slack channel
-        message = f"Threshold crossed, price changed from {ohlc_df['close'].iloc[-2]} to {ohlc_df['close'].iloc[-1]}, indicating a {(ohlc_df['changes'].iloc[-1]).round(2)} change"
+        message = f"Threshold crossed, price {direction} from {ohlc_df['close'].iloc[-2]} to {ohlc_df['close'].iloc[-1]}, indicating a {(ohlc_df['changes'].iloc[-1]).round(2)} change"
         # our message is sent using the SlackResource class
         slack_resource.get_client().chat_postMessage(channel='#rate_updates', text=message)
     else:
