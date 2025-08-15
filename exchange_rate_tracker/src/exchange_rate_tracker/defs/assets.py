@@ -9,6 +9,13 @@ import pandas as pd
 from datetime import datetime
 from dagster_slack import SlackResource
 
+from exchange_rate_tracker.defs.constants import (
+    RAW_DATA_DIR,
+    RAW_RATES_JSON,
+    USDT_PRICES_CSV,
+    BINANCE_OHLC_CSV,
+    DAILY_OHLC_CSV
+)
 
 TICKER = "USDTNGN"
 
@@ -22,10 +29,10 @@ def raw_rates(context: dg.AssetExecutionContext):
     usdt_prices = requests.get(usdt_endpoint).json()
 
     # creates the data/raw directory if it doesn't exsit
-    os.makedirs("exchange_rate_tracker/src/exchange_rate_tracker/defs/data/raw", exist_ok=True)
+    os.makedirs(RAW_DATA_DIR, exist_ok=True)
 
     # raw_rates.json is created in the data/raw directory, the file contains the endpoint data
-    with open("exchange_rate_tracker/src/exchange_rate_tracker/defs/data/raw/raw_rates.json", "w+") as file:
+    with open(RAW_RATES_JSON, "w+") as file:
         json.dump(usdt_prices, file)
 
 @dg.asset(deps=[raw_rates])
@@ -34,7 +41,7 @@ def usdt_rates(context: dg.AssetExecutionContext):
     Reading raw_rates json file and converting to a DataFrame
     """
 
-    with open("exchange_rate_tracker/src/exchange_rate_tracker/defs/data/raw/raw_rates.json", "r") as file:
+    with open(RAW_RATES_JSON, "r") as file:
         raw_rates = json.loads(file.read())
 
     symbol = raw_rates['symbol']
@@ -49,8 +56,9 @@ def usdt_rates(context: dg.AssetExecutionContext):
     usdt_rates['Date'] = pd.to_datetime(usdt_rates['Date'])
  
     usdt_rates["Price"] = usdt_rates["Price"].astype(float)
-
-    usdt_rates.to_csv("exchange_rate_tracker/src/exchange_rate_tracker/defs/data/raw/usdt_prices.csv", mode="a",index=False, header=False)
+    
+    file_exists = os.path.isfile(USDT_PRICES_CSV)
+    usdt_rates.to_csv(USDT_PRICES_CSV, mode="a",index=False, header=not file_exists)
 
 @dg.asset(deps=[usdt_rates])
 def ohlc_rates(context: dg.AssetExecutionContext):
@@ -58,7 +66,7 @@ def ohlc_rates(context: dg.AssetExecutionContext):
     Produces ohlc and price change values
     """
 
-    usdt_rates = pd.read_csv("exchange_rate_tracker/src/exchange_rate_tracker/defs/data/raw/usdt_prices.csv")
+    usdt_rates = pd.read_csv(USDT_PRICES_CSV)
 
     # set dataframe index to Date, this makes it a DateTime index
     # we can only use the resample() function on dataframes with DateTime index
@@ -67,16 +75,16 @@ def ohlc_rates(context: dg.AssetExecutionContext):
     # convert all price entries to its corresponding ohlc values and aggregate it by 15 minutes
     ohlc_df = usdt_rates["Price"].resample("15T").ohlc()
 
-    ohlc_df.to_csv("exchange_rate_tracker/src/exchange_rate_tracker/defs/data/raw/binance_ohlc_rates.csv")
+    ohlc_df.to_csv(BINANCE_OHLC_CSV)
 
-@dg.asset(deps=['usdt_rates'])
+@dg.asset(deps=usdt_rates)
 # SlackResource enables sending messages to a slack channel
 def rate_change(context: dg.AssetExecutionContext, slack_resource: SlackResource):
     """
     sends slack message on price changes
     """
 
-    usdt_rates = pd.read_csv("exchange_rate_tracker/src/exchange_rate_tracker/defs/data/raw/usdt_prices.csv")
+    usdt_rates = pd.read_csv(USDT_PRICES_CSV)
 
     usdt_rates['Date'] = pd.to_datetime(usdt_rates['Date'])
 
@@ -90,7 +98,7 @@ def rate_change(context: dg.AssetExecutionContext, slack_resource: SlackResource
     # creating a new column called "changes" that represents price change for each day
     ohlc_df['changes'] = (((ohlc_df['close']) - (ohlc_df['close']).shift(1)) / (ohlc_df['close']).shift(1)) * 100
 
-    ohlc_df.to_csv("exchange_rate_tracker/src/exchange_rate_tracker/defs/data/raw/daily_ohlc_rates.csv")
+    ohlc_df.to_csv(DAILY_OHLC_CSV)
 
     # price threshold 
     threshold = 0.5
