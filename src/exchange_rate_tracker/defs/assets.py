@@ -69,6 +69,7 @@ def ohlc_rates(context: dg.AssetExecutionContext):
     usdt_rates = pd.read_csv(USDT_PRICES_CSV)
 
     # set dataframe index to Date, this makes it a DateTime index
+    usdt_rates['Date'] = pd.to_datetime(usdt_rates['Date'])
     # we can only use the resample() function on dataframes with DateTime index
     usdt_rates = usdt_rates.set_index("Date")
 
@@ -77,7 +78,7 @@ def ohlc_rates(context: dg.AssetExecutionContext):
 
     ohlc_df.to_csv(BINANCE_OHLC_CSV)
 
-@dg.asset(deps=usdt_rates)
+@dg.asset(deps=[usdt_rates])
 # SlackResource enables sending messages to a slack channel
 def rate_change(context: dg.AssetExecutionContext, slack_resource: SlackResource):
     """
