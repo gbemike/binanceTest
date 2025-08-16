@@ -1,21 +1,19 @@
-import os
 import csv
 import json
-import requests
+import os
+from datetime import datetime
 
 import dagster as dg
 import pandas as pd
-
-from datetime import datetime
+import requests
 from dagster_slack import SlackResource
 
 from exchange_rate_tracker.defs.constants import (
-    TICKER,
-    RAW_DATA_DIR,
-    RAW_RATES_JSON,
-    USDT_PRICES_CSV,
     BINANCE_OHLC_CSV,
-    DAILY_OHLC_CSV
+    DAILY_OHLC_CSV, RAW_DATA_DIR,
+    RAW_RATES_JSON,
+    SLACK_ALERT_CHANNEL, TICKER,
+    USDT_PRICES_CSV
 )
 
 
@@ -102,17 +100,24 @@ def rate_change(context: dg.AssetExecutionContext, slack_resource: SlackResource
 
     ohlc_df.to_csv(DAILY_OHLC_CSV)
 
-    # price threshold 
-    threshold = 0.5
+    # set the threshold
+    threshold = 0.5  
 
-    # comparing the latest value(ohlc_df['changes'].iloc[-1]) to the threshold
-    # if the above condition is true a message is sent to slack
-    if abs(ohlc_df['changes'].iloc[-1]) < threshold:
-        # checks whether change is a decrease or increase
-        direction = "increased" if ohlc_df['changes'].iloc[-1] > 0 else "decreased"
-        # message variable contaisn the string value that will be sent as a message to the slack channel
-        message = f"Threshold crossed, price {direction} from {ohlc_df['close'].iloc[-2]} to {ohlc_df['close'].iloc[-1]}, indicating a {(ohlc_df['changes'].iloc[-1]).round(2)} change"
-        # our message is sent using the SlackResource class
-        slack_resource.get_client().chat_postMessage(channel='#rate_updates', text=message)
-    else:
-        pass
+    # get the last two close prices
+    prev_close, latest_close = ohlc_df['close'].iloc[-2], ohlc_df['close'].iloc[-1]
+
+    # get the latest percent change
+    latest_change = ohlc_df['changes'].iloc[-1]
+
+    # only trigger alert if change exceeds threshold
+    if abs(latest_change) >= threshold:
+        direction = "increased" if latest_change > 0 else "decreased"
+        message = (
+            f"Threshold crossed: Price {direction} from {prev_close} "
+            f"to {latest_close}, a {latest_change:.2f}% change."
+        )
+
+        slack_resource.get_client().chat_postMessage(
+            channel=SLACK_ALERT_CHANNEL,
+            text=message
+        )

@@ -1,7 +1,9 @@
+from datetime import datetime as dt
+from datetime import timedelta as td
+
 import pandas as pd
-import streamlit as st
-from datetime import datetime as dt, timedelta as td
 import plotly.graph_objects as go
+import streamlit as st
 
 st.set_page_config(layout="wide", page_title="USDT_NGN Rates Tracker")
 
