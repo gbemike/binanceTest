@@ -1,3 +1,4 @@
+TICKER = "USDTNGN"
 RAW_DATA_DIR = "src/exchange_rate_tracker/defs/data/raw"
 RAW_RATES_JSON = f"{RAW_DATA_DIR}/raw_rates.json"
 USDT_PRICES_CSV = f"{RAW_DATA_DIR}/usdt_prices.csv"

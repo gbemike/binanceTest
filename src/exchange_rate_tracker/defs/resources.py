@@ -6,12 +6,14 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
-slack_resource = SlackResource(token=os.getenv("MY_SLACK_TOKEN"))
+token = EnvVar("MY_SLACK_TOKEN")
+
+slack_integration = SlackResource(token=token)
 
 @dg.definitions
 def resources():
     return dg.Definitions(
         resources={
-            "slack_resource": slack_resource,
+            "slack_resource": slack_integration,
         }
     )

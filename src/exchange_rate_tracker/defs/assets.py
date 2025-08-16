@@ -10,6 +10,7 @@ from datetime import datetime
 from dagster_slack import SlackResource
 
 from exchange_rate_tracker.defs.constants import (
+    TICKER,
     RAW_DATA_DIR,
     RAW_RATES_JSON,
     USDT_PRICES_CSV,
@@ -17,7 +18,6 @@ from exchange_rate_tracker.defs.constants import (
     DAILY_OHLC_CSV
 )
 
-TICKER = "USDTNGN"
 
 @dg.asset
 def raw_rates(context: dg.AssetExecutionContext):
@@ -77,6 +77,7 @@ def ohlc_rates(context: dg.AssetExecutionContext):
     ohlc_df = usdt_rates["Price"].resample("15T").ohlc()
 
     ohlc_df.to_csv(BINANCE_OHLC_CSV)
+
 
 @dg.asset(deps=[usdt_rates])
 # SlackResource enables sending messages to a slack channel
