@@ -89,9 +89,7 @@ def rate_change(context: dg.AssetExecutionContext, slack_resource: SlackResource
     usdt_rates = pd.read_csv(USDT_PRICES_CSV)
 
     usdt_rates['Date'] = pd.to_datetime(usdt_rates['Date'])
-
     usdt_rates["Price"] = usdt_rates["Price"].astype(float)
-
     usdt_rates = usdt_rates.set_index("Date")
 
     # convert all price entries to its corresponding ohlc values and aggregate it by 24 hours/ 1 day
