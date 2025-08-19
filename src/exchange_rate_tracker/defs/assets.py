@@ -24,7 +24,11 @@ def raw_rates(context: dg.AssetExecutionContext):
     """
     usdt_endpoint = f"https://api.binance.com/api/v3/ticker/price?symbol={TICKER}"
     
-    usdt_prices = requests.get(usdt_endpoint).json()
+    try:
+        usdt_prices = requests.get(usdt_endpoint).json()
+    except requests.RequestException as e:
+        context.log.error("Failed to fetch data from Binance API.")
+        raise
 
     # creates the data/raw directory if it doesn't exsit
     os.makedirs(RAW_DATA_DIR, exist_ok=True)
@@ -52,7 +56,6 @@ def usdt_rates(context: dg.AssetExecutionContext):
         'Date': [date]
     })
     usdt_rates['Date'] = pd.to_datetime(usdt_rates['Date'])
- 
     usdt_rates["Price"] = usdt_rates["Price"].astype(float)
     
     file_exists = os.path.isfile(USDT_PRICES_CSV)
@@ -68,10 +71,9 @@ def ohlc_rates(context: dg.AssetExecutionContext):
 
     # set dataframe index to Date, this makes it a DateTime index
     usdt_rates['Date'] = pd.to_datetime(usdt_rates['Date'])
-    # we can only use the resample() function on dataframes with DateTime index
     usdt_rates = usdt_rates.set_index("Date")
 
-    # convert all price entries to its corresponding ohlc values and aggregate it by 15 minutes
+    # resample to 15-minute intervals and compute OHLC values
     ohlc_df = usdt_rates["Price"].resample("15T").ohlc()
 
     ohlc_df.to_csv(BINANCE_OHLC_CSV)
