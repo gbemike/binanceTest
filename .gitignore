@@ -212,3 +212,4 @@ notes.md
 archive_code/
 .tmp_dagster_home_*  
 .tmp* 
+.vscode/
